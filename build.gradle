@@ -1,0 +1,57 @@
+buildscript {
+    // Begin: added for gsdk plugin
+    repositories {
+        maven {
+            url 'https://dl.bintray.com/ttgamesdk/public'
+        }
+    }
+    dependencies {
+        classpath 'com.bytedance.ttgame:gsdk_plugin:+'
+    }
+    configurations.all {
+        resolutionStrategy {
+            cacheChangingModulesFor(0, "seconds")
+            cacheDynamicVersionsFor(0, "seconds")
+        }
+    }
+    // End
+
+    // 原有的android gradle plugin接入配置
+    repositories {
+        jcenter()
+        mavenCentral()
+        google()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.3.2'//打包必须依赖的gradle版本
+    }
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'g.gsdk'
+
+// 做相关配置
+gsdk {
+    version = '2.5.0' // 配置引入的gsdk版本号
+    optionalModules = 'share,push,voice' // 配置需要的可选组件，以逗号隔开
+    region = "cn" // 配置区域，cn: 国内, i18n: 海外
+    // 下面是可选参数，可不填，都有默认值
+    useUnityGsdk = false // 使用unity gsdk时，配置为true
+    targetFlavor = '' // 如果使用方以product_flavor形式引入gsdk，此处配置上对应的flavor
+    depType = 'api' // 有些特殊场景，可能需要以compileOnly形式引入gsdk依赖，此时配置在这里即可，默认为api
+    messi { // 使用messi聚合分包能力时，配置上
+        enabled = false // messi 开关
+        runnableApk = false // true: 构建的是可运行的字节渠道包；false：构建的是不可运行的母包
+    }
+}
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "gsdk.plugin.demo"
+        minSdkVersion 21
+        targetSdkVersion 26
+    }
+}
+
